@@ -4,14 +4,60 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from .models import *
 
+
+# class RegisterUserForm(forms.ModelForm):
+#     # username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'input-field'}))
+#     # email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'input-field'}))
+#     # password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'input-field'}))
+#
+#     class Meta:
+#         model = CS_User
+#         fields = ['username', 'email', 'password']
+#
+#         widgets = {
+#             'username': forms.TextInput(attrs={'class': 'input-field', 'minlength': '4', 'autocomplete':'off', 'required':'required'}),
+#             'email': forms.EmailInput(attrs={'class': 'input-field', 'minlength': '4', 'autocomplete':'off', 'required':'required'}),
+#             'password': forms.PasswordInput(attrs={'class': 'input-field', 'minlength': '7', 'autocomplete':'off', 'required':'required'})
+#         }
+#
+#
+# class LoginUserForm(forms.ModelForm):
+#     email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'input-field'}))
+#     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'input-field'}))
+#
+#     class Meta:
+#         model = CS_User
+#         fields = ['email', 'password']
+#
+
+
+class CustomUserForm(UserCreationForm):
+    username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'input-field'}))
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'input-field'}))
+    password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'input-field'}))
+
+    class Meta:
+        model = CS_User
+        fields = ('email', 'username', 'password1', 'is_b2b')
+
+
+
+    def __init__(self, *args, **kwargs):
+        super(CustomUserForm, self).__init__(*args, **kwargs)
+        del self.fields['password2']
+
+
 class PartnerSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # self.fields['cities_field'].empty_label = 'Категория не выбрана'
 
-    SERVICE = [('Отель', 'Отель'), ('Авиаперелёты', 'Авиаперелёты'), ('Автотранспорт', 'Автотранспорт'), ('Яхты', 'Яхты')]
+    SERVICE = [('Отель', 'Отель'), ('Авиаперелёты', 'Авиаперелёты'), ('Автотранспорт', 'Автотранспорт'),
+               ('Яхты', 'Яхты')]
     CITIES = [('Астана', 'Астана'), ('Алматы', 'Алматы')]
-    PRICE = [('10000 - 24999', '10000 - 24999'), ('25000 - 49999', '25000 - 49999'), ('50000 - 124999', '50000 - 124999'), ('125000 - 244999', '125000 - 244999'), ('250000 - 500000', '250000 - 500000')]
+    PRICE = [('10000 - 24999', '10000 - 24999'), ('25000 - 49999', '25000 - 49999'),
+             ('50000 - 124999', '50000 - 124999'), ('125000 - 244999', '125000 - 244999'),
+             ('250000 - 500000', '250000 - 500000')]
 
     cities_field = forms.ChoiceField(choices=CITIES)
     price_field = forms.ChoiceField(choices=PRICE)
@@ -28,12 +74,13 @@ class PartnerSearchForm(forms.Form):
     #
 
 
-
 class ContactForm(forms.Form):
     first_name = forms.CharField(label='Имя', widget=forms.TextInput(attrs={'placeholder': 'Имя'}), max_length=255)
-    last_name = forms.CharField(label='Фамилия', widget=forms.TextInput(attrs={'placeholder': 'Фамилия'}), max_length=255)
+    last_name = forms.CharField(label='Фамилия', widget=forms.TextInput(attrs={'placeholder': 'Фамилия'}),
+                                max_length=255)
 
-    SERVICES = [('Отель', 'Отель'), ('Авиаперелёты', 'Авиаперелёты'), ('Автотранспорт', 'Автотранспорт'), ('Яхты', 'Яхты')]
+    SERVICES = [('Отель', 'Отель'), ('Авиаперелёты', 'Авиаперелёты'), ('Автотранспорт', 'Автотранспорт'),
+                ('Яхты', 'Яхты')]
     service_choice = forms.MultipleChoiceField(
         required=False,
         widget=forms.CheckboxSelectMultiple,
@@ -44,13 +91,36 @@ class ContactForm(forms.Form):
 
     content = forms.CharField(widget=forms.Textarea(attrs={'cols': 60, 'rows': 10, 'placeholder': 'Ваше сообщение...'}))
 
-# class AddPostForm(forms.Form):
-#     title = forms.CharField(max_length=255, label='Заголовок', widget=forms.TextInput(attrs={'class': 'form-input'}))
-#     slug = forms.SlugField(max_length=255, label='URL')
-#     content = forms.CharField(widget=forms.Textarea(attrs={'cols': 60, 'rows': 10}), label='Контент')
-#     is_published = forms.BooleanField(label='Публикации', required=False, initial=True)
-#     cat = forms.ModelChoiceField(queryset=Category.objects.all(),
-#     label='Категории', empty_label='Категория не выбрана')
+
+# class ChooseServiceForm(forms.Form):
+#     SERVICES = []
+#     for service in Service.objects.all():
+#         SERVICES.append((service, service))
+#
+#     service_choice = forms.MultipleChoiceField(
+#         required=False,
+#         widget=forms.CheckboxSelectMultiple,
+#         choices=SERVICES,
+#     )
 
 
+class OrderForm(forms.ModelForm):
 
+    class Meta:
+        model = Order
+        fields = ('first_name', 'second_name', 'last_name', 'user_id_card', 'time_start', 'time_end','count', 'city', 'address', 'info')
+
+        widgets = {
+            'first_name': forms.TextInput(attrs={'placeholder': 'Имя'}),
+            'second_name': forms.TextInput(attrs={'placeholder': 'Фамилия'}),
+            'last_name': forms.TextInput(attrs={'placeholder': 'Отчество'}),
+            'time_start': forms.TimeInput(attrs={'type': 'datetime-local'}),
+            'time_end': forms.TimeInput(attrs={'type': 'datetime-local'}),
+
+            'user_id_card': forms.FileInput(attrs={'class': 'input-file', 'id': 'my-file'}),
+
+            'count': forms.TextInput(attrs={'type': 'number', 'placeholder': 'Количество'}),
+            'city': forms.TextInput(attrs={'placeholder': 'Город'}),
+            'address': forms.TextInput(attrs={'placeholder': 'Адрес'}),
+            'info': forms.Textarea(attrs={'cols': 40, 'rows': 3, 'placeholder': 'Детализируйте ваш заказ'})
+        }

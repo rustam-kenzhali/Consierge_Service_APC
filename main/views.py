@@ -5,7 +5,7 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.http import HttpResponse, HttpResponseNotFound, Http404, JsonResponse
-from django.views.generic import ListView, DeleteView, CreateView, FormView, View
+from django.views.generic import ListView, DeleteView, CreateView, FormView, View, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.contrib.auth.views import auth_login
@@ -193,7 +193,95 @@ class ProfilePage(LoginRequiredMixin, View):
     template_name = 'main/profile.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'user_orders': Order.objects.filter(username=self.request.user.username), 'top_partners': Partners.objects.all()})
+        return render(request, self.template_name, {'form': ChangeProfileForm, 'user_orders': Order.objects.filter(username=self.request.user.username), 'top_partners': Partners.objects.all()})
+
+    def post(self,  request, *args, **kwargs):
+        user = request.user
+        form = ChangeProfileForm(request.POST, request.FILES)
+
+        # user.image = form.cleaned_data['image']
+
+        if form['info'].value():
+            user.info = form['info'].value()
+
+        if form['full_name'].value():
+            user.full_name = form['full_name'].value()
+
+        if form['image'].value() != 'user/default/user.png':
+            user.image = form['image'].value()
+
+        if form['company_name']:
+            user.company_name = form['company_name'].value()
+
+        if form['company_role']:
+            user.company_role = form['company_role'].value()
+
+        if form['phone']:
+            user.phone = form['phone'].value()
+
+        if form['address']:
+            user.address = form['address'].value()
+
+        # if new_data['image']:
+        #     user.image = new_data['image']
+        #
+        user.save()
+
+
+        return redirect('profile')
+
+
+class AdminPage(View):
+    model = CS_User
+    template_name = 'main/admin.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+
+class AdminNewOrders(View):
+    model = CS_User
+    template_name = 'main/neworders.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+class AdminActiveOrders(View):
+    model = CS_User
+    template_name = 'main/activeorders.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+class AdminB2C(View):
+    model = CS_User
+    template_name = 'main/adminb2c.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+class AdminB2B(View):
+    model = CS_User
+    template_name = 'main/adminb2b.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+
+class AdminPartners(View):
+    model = CS_User
+    template_name = 'main/adminpartners.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+
+class AdminCreateService(View):
+    model = CS_User
+    template_name = 'main/adminaddservice.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
 
 
 def archive(request, year):

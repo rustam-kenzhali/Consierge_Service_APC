@@ -124,3 +124,24 @@ class OrderForm(forms.ModelForm):
             'address': forms.TextInput(attrs={'placeholder': 'Адрес'}),
             'info': forms.Textarea(attrs={'cols': 40, 'rows': 3, 'placeholder': 'Детализируйте ваш заказ'})
         }
+
+
+class ChangeProfileForm(forms.ModelForm):
+    class Meta:
+        model = CS_User
+        fields = ('info', 'full_name', 'image', 'company_name', 'company_role', 'phone', 'address', 'facebook_link', 'instagram_link', 'twitter_link')
+
+        widgets = {
+            'info': forms.TextInput(attrs={'placeholder': 'Информация о себе', 'class': 'form-control profile_input'}),
+            'full_name': forms.TextInput(attrs={'placeholder': 'Введите ваше фио', 'class': 'form-control profile_input'}),
+            'image': forms.FileInput(attrs={'class': 'form-control profile_input', 'id': 'exampleInputPhoto'}),
+            'company_name': forms.TextInput(attrs={'placeholder': 'Введите место вашей работы', 'class': 'form-control profile_input'}),
+            'company_role': forms.TextInput(attrs={'placeholder': 'Введите вашу должность', 'class': 'form-control profile_input'}),
+            'phone': forms.TextInput(attrs={'placeholder': 'Введите ваш номер', 'class': 'form-control profile_input'}),
+            'address': forms.TextInput(attrs={'placeholder': 'Введите ваш адрес', 'class': 'form-control profile_input'}),
+
+            'facebook_link': forms.URLInput(attrs={'placeholder': 'Введите ссылку на ваш аккаунт', 'class': 'form-control profile_input'}),
+            'instagram_link': forms.URLInput(attrs={'placeholder': 'Введите ссылку на ваш аккаунт', 'class': 'form-control profile_input'}),
+            'twitter_link': forms.URLInput(attrs={'placeholder': 'Введите ссылку на ваш аккаунт', 'class': 'form-control profile_input'}),
+
+        }

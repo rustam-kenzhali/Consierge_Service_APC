@@ -44,7 +44,8 @@ class Partners(models.Model):
     partner_description = models.CharField(max_length=255, verbose_name='Опизание')
     partner_city = models.CharField(max_length=100, verbose_name='Город')
     partner_price = models.CharField(max_length=100, verbose_name='Цена')
-    partner_image = models.ImageField(upload_to="partner/image/", verbose_name='Фото')
+    partner_image = models.ImageField(upload_to="partner/images/", verbose_name='Фото')
+    partner_icon = models.ImageField(upload_to="partner/icons/", verbose_name='Иконка')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')
 
     category = models.ForeignKey('Service_category', on_delete=models.PROTECT, verbose_name='Категория')
@@ -61,10 +62,18 @@ class Partners(models.Model):
         return self.partner_name
 
 
+def create_photo_path(instance, filename):
+    return os.path.join(
+        'user',
+        'photo',
+        instance.username,
+        filename
+    )
+
+
 class CS_User(AbstractUser):
     STATUS = (
-        ('b2c', 'b2b'),
-        ('b2b', 'b2b'),
+        ('user', 'user'),
         ('moderator', 'moderator'),
         ('admin', 'admin')
     )
@@ -79,13 +88,18 @@ class CS_User(AbstractUser):
 
     is_b2b = models.BooleanField(default=False)
 
-    # status = models.CharField(max_length=100, choices=STATUS, default='b2c')
+    status = models.CharField(max_length=100, choices=STATUS, default='user')
+
+    info = models.CharField(max_length=255, default='Здесь будет размещена краткая информация о вас', blank=True)
     full_name = models.CharField(max_length=255, default='', blank=True)
-    company_name = models.CharField(max_length=255, default='Должность', blank=True)
-    company_role = models.CharField(max_length=255, default='Компания', blank=True)
-    phone = PhoneField(blank=True)
+    image = models.ImageField(upload_to=create_photo_path, default='user/default/user.png' , verbose_name='Иконка', blank=True)
+    company_name = models.CharField(max_length=255, default='Компания', blank=True)
+    company_role = models.CharField(max_length=255, default='Должность', blank=True)
+    phone = models.CharField(max_length=255, blank=True)
     address = models.CharField(max_length=255, default='', blank=True)
-    image = models.ImageField(upload_to="user/image", default='user/image/user.png' , verbose_name='Иконка', blank=True)
+    facebook_link = models.CharField(max_length=255, default='https://www.facebook.com/', blank=True)
+    instagram_link = models.CharField(max_length=255, default='https://www.secure.instagram.com/conciergeservice.kz', blank=True)
+    twitter_link = models.CharField(max_length=255, default='https://twitter.com/', blank=True)
     # birthdate = models.DateField()
 
     services = models.ManyToManyField('Service')
@@ -115,7 +129,7 @@ class Order(models.Model):
 
     time_start = models.DateTimeField(verbose_name='Время начала заказа', blank=True)
     time_end = models.DateTimeField(verbose_name='Время конца заказа', blank=True)
-    count = models.IntegerField(verbose_name='Колличество')
+    count = models.IntegerField(verbose_name='Количество')
     city = models.CharField(max_length=100, verbose_name='Город')
     address = models.CharField(max_length=100, verbose_name='Адрес', blank=True)
     info = models.CharField(max_length= 1000, verbose_name='Детали', blank=True)

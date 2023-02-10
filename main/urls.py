@@ -19,5 +19,13 @@ urlpatterns = [
     path('activate/<uidb64>/<token>', activate, name='activate'),
     path('choose_service/', ChooseService.as_view(), name='choose'),
 
+    path('adminpage/', AdminPage.as_view() , name='adminprofile'),
+    path('adminneworders/', AdminNewOrders.as_view(), name='adminneworders'),
+    path('adminactiveorders/', AdminActiveOrders.as_view(), name='adminactiveorders'),
+    path('adminb2c/', AdminB2C.as_view(), name='adminb2c'),
+    path('adminb2b/', AdminB2B.as_view(), name='adminb2b'),
+    path('adminpartners/', AdminPartners.as_view(), name='adminpartners'),
+    path('admincreateservice/', AdminCreateService.as_view(), name='admincreateservice'),
+
     re_path(r'^archive/(?P<year>[0-9]{4})/', archive),
 ]
